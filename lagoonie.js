@@ -303,7 +303,8 @@ window.onload = function() {
 			
 			}
 			
-			var fullNotes = ( count.female ? count.female + "f " : "" ) + ( count.male ? count.male + "m " : "" ) + ( count.immature ? count.immature + "imm " : "" ) + ( count.juvenile ? count.juvenile + "juv" : "" ) + ( count.deceased ? count.deceased + "dec" : "" ) + count.notes + ( count.deceased ? count.deceased + " found deceased." : "" );
+			var fullNotes 	= ( count.female ? count.female + "f " : "" ) + ( count.male ? count.male + "m " : "" ) + ( count.immature ? count.immature + "imm " : "" ) + ( count.juvenile ? count.juvenile + "juv" : "" ) + ( count.deceased ? count.deceased + "dec" : "" ) + count.notes + ( count.deceased ? count.deceased + " found deceased." : "" ),
+				fullCount	= ( count.total + count.male + count.female + count.juvenile + count.immature + count.deceased );
 			
 			result += "<tr><td>" + birdBrain[ bandCode ].name + "</td><td><b>" + ( count.total + count.male + count.female+count.juvenile + count.immature + count.deceased ) + "</b> "+ ( count.female ? count.female + "f " : "" ) + ( count.male ? count.male + "m " : "" ) + ( count.immature ? count.immature + "imm " : "" ) + ( count.juvenile ? count.juvenile + "juv" : "" ) + ( count.deceased ? count.deceased + "dec" : "" ) + "</td><td><em>"+ count.notes + ( count.deceased ? count.deceased + " found deceased." : "" ) +"</em></td></tr>";
 				
@@ -312,7 +313,7 @@ window.onload = function() {
 					"Common Name":					birdBrain[ bandCode ].name,
 					"Genus":						"",
 					"Species":						"",
-					"Number":						count.total,
+					"Number":						fullCount,
 					"Species Comments":				fullNotes,
 					"Location Name":				"My test location",
 					"Latitude":						"",
