@@ -119,6 +119,23 @@ window.onload = function() {
 		textarea.value = "";
 	
 	}
+	
+	window.processMetadata	= function( lines ) {
+	
+		var lineArr 	= lines[1].split(' '),
+			location	= lines[0];
+			
+		return {
+
+			location:	location,
+			date:		lineArr[0],
+			time:		lineArr[1],
+			duration:	( !! lineArr[2] ) ? lineArr[2] : "",
+			distance:	( !! lineArr[3] ) ? lineArr[3] : ""
+			
+		};
+	
+	}
 
 	window.processList	= function() {
 	
@@ -126,12 +143,17 @@ window.onload = function() {
 			listContent	= textarea.value,
 			lines		= listContent.split(/\n/),
 			result		= "",
-			resultHTML	= document.getElementById( "lagoonie-result" );
-		
+			resultHTML	= document.getElementById( "lagoonie-result" ),
+			metadata	= window.processMetadata( lines );	
+
+		// if km is appended to distance, convert to miles
+		if( metadata.distance.search(/km/i) != -1 )
+			metadata.distance = parseFloat( metadata.distance.slice(0, -2) * 0.6214 ).toFixed(2);
+
 		result = "<p>REPORT FOR: "+ lines[0] +"<br />"+ (lines.length-1) +" species observed.</p>"+
 					"<table><tr><th>Species Name</th><th>Observed</th><th>Notes</th></tr>";
 					
-		for( var i = 1; i < lines.length; i++ ) {
+		for( var i = 2; i < lines.length; i++ ) {
 		
 			lines[i] = lines[i].trim();
 		
@@ -307,7 +329,23 @@ window.onload = function() {
 				fullCount	= ( count.total + count.male + count.female + count.juvenile + count.immature + count.deceased );
 			
 			result += "<tr><td>" + birdBrain[ bandCode ].name + "</td><td><b>" + ( count.total + count.male + count.female+count.juvenile + count.immature + count.deceased ) + "</b> "+ ( count.female ? count.female + "f " : "" ) + ( count.male ? count.male + "m " : "" ) + ( count.immature ? count.immature + "imm " : "" ) + ( count.juvenile ? count.juvenile + "juv" : "" ) + ( count.deceased ? count.deceased + "dec" : "" ) + "</td><td><em>"+ count.notes + ( count.deceased ? count.deceased + " found deceased." : "" ) +"</em></td></tr>";
+			
+			var date = new Date();
+			
+			// assume protocol based on metadata given
+			if( !! metadata.distance && !! metadata.duration )
+				metadata.protocol	= "Traveling";
+			else if( !! metadata.duration && ! metadata.distance )
+				metadata.protocol	= "Stationary";
+			else 
+				metadata.protocol	= "Casual";
+
+			// adding year, assuming current year
+			if( metadata.date.length == 5 )
+				metadata.date += "-" + date.getFullYear();
 				
+			metadata.date = metadata.date.replace( /-/g, "/" );
+								
 			speciesReports.add( new window.speciesReport({
 			
 					"Common Name":					birdBrain[ bandCode ].name,
@@ -315,20 +353,20 @@ window.onload = function() {
 					"Species":						"",
 					"Number":						fullCount,
 					"Species Comments":				fullNotes,
-					"Location Name":				"My test location",
+					"Location Name":				metadata.location,
 					"Latitude":						"",
 					"Longitude":					"",
-					"Date":							"09/07/2013",
-					"Start Time":					"13:30",
+					"Date":							metadata.date,
+					"Start Time":					metadata.time,
 					"State/Province":				"ON",
 					"Country Code":					"CA",
-					"Protocol":						"Traveling",
+					"Protocol":						metadata.protocol,
 					"Number of Observers":			1,
-					"Duration":						60,
+					"Duration":						metadata.duration,
 					"All observations reported?":	"Y",
-					"Effort Distance Miles":		1,
+					"Effort Distance Miles":		metadata.distance,
 					"Effort Area Acres":			"",
-					"Submission Comments":			"This is a test.."
+					"Submission Comments":			"List generated using Lagoonie, written by Rob Porter."
 			
 				})
 				
@@ -346,6 +384,18 @@ window.onload = function() {
 		resultHTML.innerHTML = result;
 		
 		speciesReports = new window.speciesReportCollection();
+		
+		encodedUri = encodeURI( "data:text/csv;charset=utf-8," + csvResult );
+		
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		link.setAttribute("target", "_blank" );
+		link.setAttribute("download", "ebird-ready.csv");
+		link.innerHTML = "DOWNLOAD";
+		
+		resultHTML.appendChild( link );
+		
+		//link.click(); // This will download the data file named "my_data.csv".
 	
 	}
 
