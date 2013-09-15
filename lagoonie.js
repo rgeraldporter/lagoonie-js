@@ -72,7 +72,9 @@ function toCsv(objArray, sDelimiter, cDelimiter) {
 	return output;
 }
 
-window.speciesReport = function( config ) {
+lagoonie = {};
+
+lagoonie.speciesReport = function( config ) {
 
 	for( var column in config ) {
 	
@@ -82,7 +84,7 @@ window.speciesReport = function( config ) {
 	
 }
 
-window.speciesReportCollection = function( speciesReports ) {
+lagoonie.speciesReportCollection = function( speciesReports ) {
 
 	var elements = [];
 	
@@ -110,9 +112,9 @@ window.onload = function() {
 
 	var submitButton	= document.getElementById( "lagoonie-process" );
 	var resetButton		= document.getElementById( "lagoonie-reset" );
-	var speciesReports	= new window.speciesReportCollection();
+	var speciesReports	= new lagoonie.speciesReportCollection();
 	
-	window.resetList	= function() {
+	lagoonie.resetList	= function() {
 	
 		var textarea	= document.getElementById( "lagoonie-textarea" );
 		
@@ -120,7 +122,7 @@ window.onload = function() {
 	
 	}
 	
-	window.processMetadata	= function( lines ) {
+	lagoonie.processMetadata	= function( lines ) {
 	
 		var lineArr 	= lines[1].split(' '),
 			location	= lines[0];
@@ -137,14 +139,14 @@ window.onload = function() {
 	
 	}
 
-	window.processList	= function() {
+	lagoonie.processList	= function() {
 	
 		var textarea	= document.getElementById( "lagoonie-textarea" ),
 			listContent	= textarea.value,
 			lines		= listContent.split(/\n/),
 			result		= "",
 			resultHTML	= document.getElementById( "lagoonie-result" ),
-			metadata	= window.processMetadata( lines );	
+			metadata	= lagoonie.processMetadata( lines );	
 
 		// if km is appended to distance, convert to miles
 		if( metadata.distance.search(/km/i) != -1 )
@@ -346,7 +348,7 @@ window.onload = function() {
 				
 			metadata.date = metadata.date.replace( /-/g, "/" );
 								
-			speciesReports.add( new window.speciesReport({
+			speciesReports.add( new lagoonie.speciesReport({
 			
 					"Common Name":					birdBrain[ bandCode ].name,
 					"Genus":						"",
@@ -383,7 +385,7 @@ window.onload = function() {
 		
 		resultHTML.innerHTML = result;
 		
-		speciesReports = new window.speciesReportCollection();
+		speciesReports = new lagoonie.speciesReportCollection();
 		
 		encodedUri = encodeURI( "data:text/csv;charset=utf-8," + csvResult );
 		
@@ -399,11 +401,11 @@ window.onload = function() {
 	
 	}
 
-	submitButton.addEventListener( 'touchend', window.processList );
-	submitButton.addEventListener( 'click', window.processList );
+	submitButton.addEventListener( 'touchend', lagoonie.processList );
+	submitButton.addEventListener( 'click', lagoonie.processList );
 	
-	resetButton.addEventListener( 'touchend', window.resetList );
-	resetButton.addEventListener( 'click', window.resetList );
+	resetButton.addEventListener( 'touchend', lagoonie.resetList );
+	resetButton.addEventListener( 'click', lagoonie.resetList );
 
 
 }
