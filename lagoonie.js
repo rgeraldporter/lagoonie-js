@@ -112,13 +112,16 @@ window.onload = function() {
 
 	var submitButton	= document.getElementById( "lagoonie-process" );
 	var resetButton		= document.getElementById( "lagoonie-reset" );
+	var appendButton	= document.getElementById( "lagoonie-append" );
 	var speciesReports	= new lagoonie.speciesReportCollection();
 	
 	lagoonie.resetList	= function() {
 	
 		var textarea	= document.getElementById( "lagoonie-textarea" );
-		
-		textarea.value = "";
+			
+		// allow appendage
+		appendButton.style.display 	= "none";
+		textarea.value 				= "";
 	
 	}
 	
@@ -138,16 +141,27 @@ window.onload = function() {
 		};
 	
 	}
+	
+	lagoonie.appendList		= function () {
+	
+		lagoonie.processList( true );
+	
+	}
 
-	lagoonie.processList	= function() {
+	lagoonie.processList	= function( append ) {
+	
+		console.log( append );
 	
 		var textarea	= document.getElementById( "lagoonie-textarea" ),
 			listContent	= textarea.value,
 			lines		= listContent.split(/\n/),
 			result		= "",
 			resultHTML	= document.getElementById( "lagoonie-result" ),
-			metadata	= lagoonie.processMetadata( lines );	
-
+			metadata	= lagoonie.processMetadata( lines );
+			
+		// allow appendage
+		appendButton.style.display = "block";
+		
 		// if km is appended to distance, convert to miles
 		if( metadata.distance.search(/km/i) != -1 )
 			metadata.distance = parseFloat( metadata.distance.slice(0, -2) * 0.6214 ).toFixed(2);
@@ -385,7 +399,11 @@ window.onload = function() {
 		
 		resultHTML.innerHTML = result;
 		
-		speciesReports = new lagoonie.speciesReportCollection();
+		if( true !== append ) {
+
+			speciesReports = new lagoonie.speciesReportCollection();
+			
+		}
 		
 		encodedUri = encodeURI( "data:text/csv;charset=utf-8," + csvResult );
 		
@@ -406,6 +424,8 @@ window.onload = function() {
 	
 	resetButton.addEventListener( 'touchend', lagoonie.resetList );
 	resetButton.addEventListener( 'click', lagoonie.resetList );
-
+	
+	appendButton.addEventListener( 'touchend', lagoonie.appendList );
+	appendButton.addEventListener( 'click', lagoonie.appendList );
 
 }
