@@ -1,12 +1,12 @@
 CACHE MANIFEST
 
 #
-# version 0.5
+# version 0.5.1
 #
 
 CACHE:
 index.html
-lib/birdbrain/birdbrain.js
+lib/birdbrain/birdbrain.jss
 lagoonie.js
 
 NETWORK:
